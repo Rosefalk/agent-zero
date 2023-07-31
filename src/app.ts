@@ -1,18 +1,20 @@
-import puppeteer from 'puppeteer';
+import puppeteer, {type Browser, Page} from 'puppeteer';
 import minimist from 'minimist'
 
-import * as streams from './streams.ts'
+import streams, {Stream} from './streams.ts'
 import { createText } from './utilities.ts'
-import {Page} from "puppeteer/lib/esm/puppeteer/common/Page.js";
+
+export type Accumulator = unknown[]
 
 const mockPromise = (time: number) => new Promise((resolve) => {
 	const interval: NodeJS.Timeout = setInterval(() => resolve( () => clearInterval(interval)), time)
 })
 
-const flow = async (page: Page, stream, accumulator = [], tab = '') => {
-	return await stream.reduce(async (previousPromise, streamlet) => {
+const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], tab = '') => {
+	
+	return stream.reduce(async (previousPromise: Promise<any>, streamlet) => {
 		await previousPromise
-		streamlet.type = streamlet.type.toLowerCase()
+		streamlet.type = <typeof streamlet['type']>streamlet.type.toLowerCase()
 
 		const run = async () => {
 			console.log(`${tab}> ${streamlet.type}${streamlet.url ? ': ' + streamlet.url : ''}`)
@@ -34,7 +36,7 @@ const flow = async (page: Page, stream, accumulator = [], tab = '') => {
 				streamlet.loop &&
 					(streamlet.loop.loops === -1 || ++loopCounter < streamlet.loop.loops)
 					? loop()
-					: resolve()
+					: resolve(true)
 			}
 
 			loop()
@@ -46,19 +48,24 @@ const flow = async (page: Page, stream, accumulator = [], tab = '') => {
 	}, Promise.resolve())
 }
 
-const init = async ({ default: config }) => {
+// support for raspberry pi
+const init = async ({ default: config }: {default: Record<string, Stream>}) => {
 	console.info(createText.header('Puppeteer'))
 
 	if(args.arm)
 		console.info('Running in ARM mode using OS Browser (chromium-browser)')
 
-	const browser = await puppeteer
+	const browser: Browser | void = await puppeteer
 		.launch(args.arm ? { executablePath: 'chromium-browser' } : {})
-		.catch(e => console.error('If running on an ARM platform use --arm true', e))
+		.catch((e: string) => console.error('If running on an ARM platform use --arm true', e))
 
+	if(!browser) return console.error('No browser')
+	
 	console.info('• Browser Created')
 
 	const page = await browser.newPage().catch(console.error)
+	
+	if(!page) return console.error('No page')
 
 	console.info('• Page Created')
 	console.info('• Ready')
@@ -75,6 +82,6 @@ const init = async ({ default: config }) => {
 
 const args = minimist(process.argv.slice(2))
 
-import(args.config || args.c || './configs/config.js')
+import(args.config || args.c || './configs/config.ts')
 	.then(init)
 	.catch(console.error)

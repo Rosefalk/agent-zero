@@ -1,41 +1,60 @@
+import { type Accumulator} from "./app.js";
 /* Puppeteer */
+
+export type Streamlet = {
+	page: Page,
+	type: 'page' | 'wait' | 'reload' | 'click' | 'keyboardPress' | 'login' | 'evaluate' | 'run' | 'accumulation',
+	accumulate?: boolean,
+	grab?: string,
+	log?: { date: boolean },
+	stream?: Stream,
+	handle?: StreamInvoker,
+	onResponse?: (response: unknown, accumulator: Accumulator, tab: string) => Promise<void>,
+	[key: string]: any,
+}
+
+export interface StreamInvoker {
+	(page: Page, streamlet?: Streamlet, accumulator?: Accumulator, tab?: string): Promise<void | unknown>
+}
+
+export type Stream = Streamlet[]
 
 // Simple
 import {Page} from "puppeteer/lib/esm/puppeteer/common/Page.js";
 
-export const page = async (page: Page, { type, url = '' }) =>
+export const page: StreamInvoker = async (page, { type, url = '' })=>
 	await page.goto(url).catch(error => console.error(type, error))
 
-export const wait = async (page: Page, { type, element = '', visible = true, timeout = 0 }) =>
+export const wait: StreamInvoker = async (page, { type, element = '', visible = true, timeout = 0 }) =>
 	await page.waitForSelector(element, { visible, timeout }).catch(error => console.error(type, error))
 
-export const reload = async (page: Page, { type }) =>
+export const reload: StreamInvoker = async (page, { type }) =>
 	await page.reload().catch(error => console.error(type, error))
 
-export const click = async (page: Page, { type, element = '' }) =>
+export const click: StreamInvoker = async (page, { type, element = '' }) =>
 	await page.click(element).catch(error => console.error(type, error))
 
-export const keyboardPress = async (page: Page, { type, keyCode = 13 }) => {
-	await page.keyboard.press(String.fromCharCode(keyCode)).catch(error => console.error(type, error))
+export const keyboardPress: StreamInvoker = async (page, { type, keyCode = 13 }) => {
+	await page.keyboard.press(<any>String.fromCharCode(keyCode)).catch(error => console.error(type, error))
 }
 
 // Compound
-export const login = async (page: Page, { type, id = '', password = '', idElement = '', passwordElement = '' }) => {
+export const login: StreamInvoker = async (page, { type, id = '', password = '', idElement = '', passwordElement = '' }) => {
 	await page.click(idElement).catch(error => console.error(type, error))
 	await page.keyboard.type(id).catch(error => console.error(type, error))
 
 	await page.click(passwordElement).catch(error => console.error(type, error))
 	await page.keyboard.type(password).catch(error => console.error(type, error))
 
-	await page.keyboard.press(String.fromCharCode(13)).catch(error => console.error(type, error))
+	await page.keyboard.press(<any>String.fromCharCode(13)).catch(error => console.error(type, error))
 }
 
-export const evaluate = async (page: Page, { type, element = '', onResponse = (e) => e, accumulate, grab = 'textContent', log }, accumulator, tab) => {
-	let response = await page
-		.$$eval(element, (els, grab) => els.map(el => grab ? el[grab]: el), grab) // evaluation happens in browser context, not in node context so grab has to be passed
-		.catch(error => console.error(type, error))
+export const evaluate: StreamInvoker = async (page, { type, element = '', onResponse, accumulate, grab = 'textContent', log }, accumulator, tab) => {
+	const request = await page
+		.$$eval(element, (els: any[], grab: Streamlet['grab']) => els.map(el => grab ? el[grab] : el), grab) // evaluation happens in browser context, not in node context so grab has to be passed
+		.catch((error: any) => console.error(type, error))
 
-	response = onResponse(response, accumulator, tab)
+	const response = onResponse(request, accumulator, tab)
 
 	if(log) {
 		const date = log.date
@@ -49,13 +68,18 @@ export const evaluate = async (page: Page, { type, element = '', onResponse = (e
 }
 
 /* Streamlet Utilities */
-export const run = (page: Page, streamlet, accumulator) => // Last resort you can use this to run your own custom thing
-	streamlet.handle
+export const run: StreamInvoker = (page, streamlet, accumulator: Accumulator) => {// Last resort you can use this to run your own custom thing
+	const rtn = streamlet.handle
 		? streamlet.handle(page, streamlet, accumulator)
-		: console.error('no handle to execute')
+		: null
+	
+	if(!rtn) console.warn(`• streamlet ${streamlet.type} has no handle function`)
+	
+	return rtn
+}
 
-export const accumulation = (_page: Page, {handle}, accumulator) =>
-	handle(accumulator)
+export const accumulation: StreamInvoker = (page, streamlet, accumulator) =>
+	streamlet.handle(page, streamlet, accumulator)
 
 
 export default {

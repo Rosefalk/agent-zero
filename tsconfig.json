@@ -1,7 +1,6 @@
 ﻿{
 	"compilerOptions": {
 		"noImplicitAny": true,
-		"noEmitOnError": true,
 		"removeComments": true,
 		"sourceMap": true,
 		"target": "ESNext",
@@ -9,9 +8,10 @@
 		"module": "ESNext",
 		"moduleResolution": "NodeNext",
 		"allowImportingTsExtensions": true,
+		"forceConsistentCasingInFileNames": true,
+		"noEmit": true,
 	},
 	"include": [
-		"src/**/*",
-		"node_modules/@types/puppeteer/index.d.ts"
+		"./src/**/*",
 	],
 }

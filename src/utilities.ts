@@ -8,7 +8,7 @@ import axios from 'axios'
  * @param {*} value2 
  * @param {*} value3 
  */
-export const ifttt = (key, event, value1, value2, value3) => {
+export const ifttt = (key: string, event: string, value1: unknown, value2: unknown, value3: unknown) => {
 	axios.post(`https://maker.ifttt.com/trigger/${event}/with/key/${key}`, {
 		value1,
 		value2,
