@@ -14,7 +14,7 @@ export const ifttt = (key, event, value1, value2, value3) => {
 		value2,
 		value3
 	})
-		.catch(console.error)
+	.catch(console.error)
 }
 
 export const createText = {

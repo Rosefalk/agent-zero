@@ -1,14 +1,15 @@
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer';
 import minimist from 'minimist'
 
-import streams from './streams.js'
-import { createText } from './utilities.js'
+import * as streams from './streams.ts'
+import { createText } from './utilities.ts'
+import {Page} from "puppeteer/lib/esm/puppeteer/common/Page.js";
 
-const mockPromise = (time) => new Promise((resolve) => {
-	const interval = setInterval(() => resolve(clearInterval(interval)), time)
+const mockPromise = (time: number) => new Promise((resolve) => {
+	const interval: NodeJS.Timeout = setInterval(() => resolve( () => clearInterval(interval)), time)
 })
 
-const flow = async (page, stream, accumulator = [], tab = '') => {
+const flow = async (page: Page, stream, accumulator = [], tab = '') => {
 	return await stream.reduce(async (previousPromise, streamlet) => {
 		await previousPromise
 		streamlet.type = streamlet.type.toLowerCase()
