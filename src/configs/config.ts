@@ -1,4 +1,4 @@
-import {Config} from "../app.ts";
+import {Config} from "../types.ts";
 
 export default <Config>{
 	stream: [{

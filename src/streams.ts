@@ -1,22 +1,4 @@
-import { type Accumulator} from "./app.js";
-import {Page} from "puppeteer";
-
-export type Streamlet = {
-	type: 'page' | 'wait' | 'reload' | 'click' | 'keyboardPress' | 'login' | 'evaluate' | 'run' | 'accumulation',
-	accumulate?: boolean,
-	grab?: string,
-	log?: { date: boolean },
-	stream?: Stream,
-	handle?: StreamInvoker,
-	onResponse?: (response: unknown, accumulator: Accumulator, tab: string) => Promise<void>,
-	[key: string]: any,
-}
-
-export interface StreamInvoker {
-	(page: Page, streamlet: Streamlet, accumulator: Accumulator, tab?: string): Promise<void | unknown>
-}
-
-export type Stream = Streamlet[]
+import type { StreamInvoker, Streamlet, Accumulator } from "./types.ts";
 
 // Simple
 

@@ -30,3 +30,7 @@ export const createText = {
 		return `${line}\n${headerSpace}${str}${headerSpace}\n${line}`
 	}
 }
+
+export const mockPromise = (time: number) => new Promise((resolve) => {
+	const interval: NodeJS.Timeout = setInterval(() => resolve( () => clearInterval(interval)), time)
+})

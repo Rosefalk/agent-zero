@@ -1,18 +1,8 @@
+import type { Accumulator, Stream } from "./types.ts";
 import puppeteer, {type Browser, Page, PuppeteerLaunchOptions} from 'puppeteer';
 import minimist from 'minimist'
-
-import streams, {Stream} from './streams.ts'
-import { createText } from './utilities.ts'
-
-export interface Config {
-	stream: Stream
-}
-
-export type Accumulator = unknown[]
-
-const mockPromise = (time: number) => new Promise((resolve) => {
-	const interval: NodeJS.Timeout = setInterval(() => resolve( () => clearInterval(interval)), time)
-})
+import {createText, mockPromise} from './utilities.ts'
+import streams from "./streams.ts";
 
 const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], tab = '') => {
 	
