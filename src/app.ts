@@ -4,6 +4,10 @@ import minimist from 'minimist'
 import streams, {Stream} from './streams.ts'
 import { createText } from './utilities.ts'
 
+export interface Config {
+	stream: Stream
+}
+
 export type Accumulator = unknown[]
 
 const mockPromise = (time: number) => new Promise((resolve) => {
@@ -79,6 +83,8 @@ const init = async ({ default: config }: {default: Record<string, Stream>}) => {
 	console.info(createText.header('End of stream reached - closing'))
 
 	await browser.close()
+
+	process.exit()
 }
 
 const args = minimist(process.argv.slice(2))

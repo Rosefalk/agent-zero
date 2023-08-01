@@ -1,4 +1,6 @@
-const configuration = {
+import {Config} from "../app.ts";
+
+export default <Config>{
 	stream: [{
 		type: 'page',
 		url: 'https://example.com',
@@ -19,5 +21,3 @@ const configuration = {
 		}]
 	}]
 }
-
-export default configuration

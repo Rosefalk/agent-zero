@@ -2,7 +2,6 @@ import { type Accumulator} from "./app.js";
 import {Page} from "puppeteer";
 
 export type Streamlet = {
-	page: Page,
 	type: 'page' | 'wait' | 'reload' | 'click' | 'keyboardPress' | 'login' | 'evaluate' | 'run' | 'accumulation',
 	accumulate?: boolean,
 	grab?: string,
