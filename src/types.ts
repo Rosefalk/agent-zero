@@ -1,7 +1,10 @@
-﻿import {Page} from "puppeteer";
+﻿import type {Page, PuppeteerLaunchOptions} from "puppeteer";
 
-export interface Config {
+export type Config = {
+	browsers: number, // number of browsers to open for each user
+	puppeteer: PuppeteerLaunchOptions,
 	stream: Stream
+	name?: string,
 }
 
 export type Accumulator = unknown[]

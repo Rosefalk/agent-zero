@@ -1,6 +1,13 @@
 import {Config} from "../types.ts";
 
-export default <Config>{
+const config: Config[] = [{
+	browsers: 1, // number of browsers to open for each user
+	name: 'main',
+	puppeteer: {
+		headless: 'new', // 'new' is headless, false opens browsers
+		args: ['--incognito'],
+		timeout: 0
+	},
 	stream: [{
 		type: 'page',
 		url: 'https://example.com',
@@ -14,10 +21,8 @@ export default <Config>{
 			log: {
 				date: true
 			}
-		}, {
-			type: 'evaluate',
-			element: 'div > p',
-			accumulate: true
 		}]
 	}]
-}
+}]
+
+export default config

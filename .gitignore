@@ -8,6 +8,7 @@ configs/**/*
 # Node artifact files
 node_modules/
 dist/
+configs/
 
 # Compiled Java class files
 *.class
