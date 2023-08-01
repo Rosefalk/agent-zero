@@ -1,4 +1,4 @@
-import puppeteer, {type Browser, Page} from 'puppeteer';
+import puppeteer, {type Browser, Page, PuppeteerLaunchOptions} from 'puppeteer';
 import minimist from 'minimist'
 
 import streams, {Stream} from './streams.ts'
@@ -55,8 +55,9 @@ const init = async ({ default: config }: {default: Record<string, Stream>}) => {
 	if(args.arm)
 		console.info('Running in ARM mode using OS Browser (chromium-browser)')
 
+	const launchOptions: PuppeteerLaunchOptions = { headless: 'new' }
 	const browser: Browser | void = await puppeteer
-		.launch(args.arm ? { executablePath: 'chromium-browser' } : {})
+		.launch(args.arm ? { executablePath: 'chromium-browser', ...launchOptions } : launchOptions)
 		.catch((e: string) => console.error('If running on an ARM platform use --arm true', e))
 
 	if(!browser) return console.error('No browser')
