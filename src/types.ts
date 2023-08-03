@@ -10,7 +10,7 @@ export type Config = {
 export type Accumulator = unknown[]
 
 export type Streamlet = {
-	type: 'page' | 'wait' | 'reload' | 'click' | 'keyboardPress' | 'login' | 'evaluate' | 'run' | 'accumulation',
+	type: 'page' | 'wait' | 'reload' | 'click' | 'keyboardPress' | 'login' | 'evaluate' | 'run' | 'accumulation' | 'endpoints' | 'waitnetwork',
 	accumulate?: boolean,
 	grab?: string,
 	log?: { date: boolean },

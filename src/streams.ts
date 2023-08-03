@@ -1,4 +1,5 @@
 import type { StreamInvoker, Streamlet, Accumulator } from "./types.ts";
+import {HTTPResponse} from "puppeteer";
 
 // Simple
 
@@ -7,6 +8,9 @@ export const page: StreamInvoker = async (page, { type, url = '' })=>
 
 export const wait: StreamInvoker = async (page, { type, element = '', visible = true, timeout = 0 }) =>
 	await page.waitForSelector(element, { visible, timeout }).catch((error: string) => console.error(type, error))
+
+export const waitnetwork: StreamInvoker = async (page, { type, until = 'networkidle0' }) =>
+	await page.waitForNavigation({ waitUntil: until }).catch((error: string) => console.error(type, error))
 
 export const reload: StreamInvoker = async (page, { type }) =>
 	await page.reload().catch((error: string) => console.error(type, error))
@@ -38,7 +42,7 @@ export const evaluate: StreamInvoker = async (page, { type, element = '', onResp
 
 	if(onResponse) response = await onResponse(response, accumulator, tab)
 
-	if(log) {
+	if(log?.date) {
 		const date = log.date
 			? new Date(Date.now()) + ': '
 			: ''
@@ -47,6 +51,39 @@ export const evaluate: StreamInvoker = async (page, { type, element = '', onResp
 	}
 
 	if(accumulate) accumulator.push(response)
+}
+
+export const endpoints: StreamInvoker = async (page, streamlet, accumulator, tab) => {
+	const {endpoints, timeout= 10000} = streamlet as Streamlet & {endpoints: string | string[], timeout?: number}
+	const endpointArray = Array.isArray(endpoints) ? endpoints : [endpoints]
+	
+	const responses: HTTPResponse[] = await Promise.all(endpointArray.map(endpoint =>
+		page.waitForResponse(endpoint, {timeout}).catch((e) => e.message)))
+	
+	const responseReturn = responses.reduce((acc, response, i) => {
+		if(!response.url) return {
+			...acc,
+			[endpointArray[i]]: {
+				status: 'error',
+				timing: 'N/A',
+				response
+			}
+		}
+		
+		const timing = response?.timing()
+		
+		return {
+			...acc,
+			[response.url()]: {
+				status: response?.status(),
+				timing: timing !== null ? `${(timing.sendEnd - timing.sendStart).toFixed(3)}ms` : 'N/A',
+			}
+		}
+	}, {})
+	
+	console.log(`  ${tab}└ endpoints result`, responseReturn)
+	
+	return responseReturn
 }
 
 /* Streamlet Utilities */
@@ -73,9 +110,11 @@ export default {
 	reload,
 	click,
 	keyboardPress,
+	waitnetwork,
 	// Compound
 	login,
 	evaluate,
+	endpoints,
 	// Streamlet Utilities
 	run,
 	accumulation
