@@ -1,0 +1,15 @@
+{
+  "id": "2dc67449-812c-4fb2-a61d-1864976a0e0f",
+  "label": "agent-zero NoFlo runtime",
+  "secret": "gotapotafa",
+  "permissions": {
+    "gotapotafa": [
+      "protocol:component",
+      "protocol:runtime",
+      "protocol:graph",
+      "protocol:network",
+      "component:getsource",
+      "component:setsource"
+    ]
+  }
+}
