@@ -15,15 +15,17 @@ export const waitnetwork: StreamInvoker = async (page, { type, until = 'networki
 export const reload: StreamInvoker = async (page, { type }) =>
 	await page.reload().catch((error: string) => console.error(type, error))
 
-export const click: StreamInvoker = async (page, { type, element = '' }) =>
-	await page.click(element).catch((error: string) => console.error(type, error))
+export const click: StreamInvoker = async (page, { type, element = '', wait = true }) => {
+	if(wait) page.waitForSelector(element).catch((error: string) => console.error(type, error))
+	return await page.click(element).catch((error: string) => console.error(type, error))
+}
 
 export const keyboardPress: StreamInvoker = async (page, { type, keyCode = 13 }) => {
 	await page.keyboard.press(<any>String.fromCharCode(keyCode)).catch((error: string) => console.error(type, error))
 }
 
 // Compound
-export const login: StreamInvoker = async (page, { type, id = '', password = '', idElement = '', passwordElement = '' }) => {
+export const login: StreamInvoker = async (page, { type, id = '', password = '', idElement = '', passwordElement = '', loginButton='' }) => {
 	if(!id) console.warn(type, 'missing id')
 	if(!password) console.warn(type, 'missing password')
 	
@@ -39,6 +41,8 @@ export const login: StreamInvoker = async (page, { type, id = '', password = '',
 	await page.keyboard.type(password).catch((error: string) => console.error(type, error))
 
 	await page.keyboard.press(<any>String.fromCharCode(13)).catch((error: string) => console.error(type, error))
+
+	if(loginButton)	await page.click(loginButton).catch((error: string) => console.error(type, error))
 }
 
 export const evaluate: StreamInvoker = async (page, { type, element = '', onResponse, accumulate, grab = 'textContent', log }, accumulator, tab = '  ') => {
