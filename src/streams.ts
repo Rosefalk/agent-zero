@@ -87,7 +87,10 @@ export const endpoints: StreamInvoker = async (page, streamlet, accumulator, tab
 		}
 	}, {})
 
-	console.log(`  ${tab}└ endpoints result`, responseReturn)
+	if(streamlet.accumulate) accumulator.push(responseReturn)
+	else {
+		console.log(`  ${tab}└ endpoints result`, responseReturn)
+	}
 
 	return responseReturn
 }
