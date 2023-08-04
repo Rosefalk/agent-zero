@@ -24,6 +24,12 @@ export const keyboardPress: StreamInvoker = async (page, { type, keyCode = 13 })
 
 // Compound
 export const login: StreamInvoker = async (page, { type, id = '', password = '', idElement = '', passwordElement = '' }) => {
+	if(!id) console.warn(type, 'missing id')
+	if(!password) console.warn(type, 'missing password')
+	
+	if(!(idElement && passwordElement))
+		return console.error(type, `missing required idElement (${idElement}) or passwordElement (${passwordElement})`)
+	
 	await page.waitForSelector(idElement).catch((error: string) => console.error(type, error))
 	await page.waitForSelector(passwordElement).catch((error: string) => console.error(type, error))
 	await page.click(idElement).catch((error: string) => console.error(type, error))

@@ -73,12 +73,10 @@ const init = async (config: Config[]) => {
 			const result = await flow(page, userConfig.stream)
 
 			console.info(createText.line())
-			console.log('• result', result)
+			console.log('• accumulate result', result)
 			console.info(createText.header('End of stream reached - closing'))
 
 			await browser.close()
-
-			// process.exit(
 		})
 
 		return await Promise.all(processes)
