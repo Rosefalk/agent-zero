@@ -1,6 +1,6 @@
 import type { StreamInvoker, Streamlet, Accumulator } from "./types.ts";
 import {HTTPResponse} from "puppeteer";
-
+import { randomUUID } from "crypto";
 // Simple
 
 export const page: StreamInvoker = async (page, { type, url = '' })=>
@@ -54,14 +54,14 @@ export const evaluate: StreamInvoker = async (page, { type, element = '', onResp
 }
 
 export const endpoints: StreamInvoker = async (page, streamlet, accumulator, tab) => {
-	const {endpoints, timeout= 10000} = streamlet as Streamlet & {endpoints: string | string[], timeout?: number}
+	const {endpoints, timeout = 10000} = streamlet as Streamlet & { endpoints: string | string[], timeout?: number }
 	const endpointArray = Array.isArray(endpoints) ? endpoints : [endpoints]
-	
+
 	const responses: HTTPResponse[] = await Promise.all(endpointArray.map(endpoint =>
 		page.waitForResponse(endpoint, {timeout}).catch((e) => e.message)))
-	
+
 	const responseReturn = responses.reduce((acc, response, i) => {
-		if(!response.url) return {
+		if (!response.url) return {
 			...acc,
 			[endpointArray[i]]: {
 				status: 'error',
@@ -69,9 +69,9 @@ export const endpoints: StreamInvoker = async (page, streamlet, accumulator, tab
 				response
 			}
 		}
-		
+
 		const timing = response?.timing()
-		
+
 		return {
 			...acc,
 			[response.url()]: {
@@ -80,10 +80,16 @@ export const endpoints: StreamInvoker = async (page, streamlet, accumulator, tab
 			}
 		}
 	}, {})
-	
+
 	console.log(`  ${tab}└ endpoints result`, responseReturn)
-	
+
 	return responseReturn
+}
+	
+export const screenshot: StreamInvoker = async (page, streamlet, accumulator, tab) => {
+	const path = streamlet.path || `screenshots/${randomUUID()}.png`
+	await page.screenshot({path})
+	console.log(`  ${tab}└ screenshot saved as ${path}`)
 }
 
 /* Streamlet Utilities */
@@ -115,6 +121,7 @@ export default {
 	login,
 	evaluate,
 	endpoints,
+	screenshot,
 	// Streamlet Utilities
 	run,
 	accumulation
