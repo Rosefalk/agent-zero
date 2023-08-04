@@ -16,7 +16,7 @@ export const reload: StreamInvoker = async (page, { type }) =>
 	await page.reload().catch((error: string) => console.error(type, error))
 
 export const click: StreamInvoker = async (page, { type, element = '', wait = true }) => {
-	if(wait) page.waitForSelector(element).catch((error: string) => console.error(type, error))
+	if(wait) await page.waitForSelector(element).catch((error: string) => console.error(type, error))
 	return await page.click(element).catch((error: string) => console.error(type, error))
 }
 
