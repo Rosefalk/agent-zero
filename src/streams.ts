@@ -3,6 +3,9 @@ import {HTTPResponse} from "puppeteer";
 import { randomUUID } from "crypto";
 // Simple
 
+export const page: StreamInvoker = async (page, { type, url = '' }) =>
+	await page.browser().newPage()
+
 export const goTo: StreamInvoker = async (page, { type, url = '' })=>
 	await page.goto(url).catch((error: string) => console.error(type, error))
 
@@ -100,7 +103,7 @@ export const endpoints: StreamInvoker = async (page, streamlet, accumulator, tab
 }
 	
 export const screenshot: StreamInvoker = async (page, streamlet, accumulator, tab) => {
-	const path = streamlet.path || `screenshots/${randomUUID()}.png`
+	const path = streamlet.path || `screenshots/${(new Date).toISOString().split(':').shift()}-${randomUUID()}.png`
 	await page.screenshot({path})
 	console.log(`  ${tab}└ screenshot saved as ${path}`)
 }
@@ -124,6 +127,7 @@ export const accumulation: StreamInvoker = async (page, streamlet, accumulator) 
 
 export default {
 	// Simple
+	page,
 	goTo,
 	wait,
 	reload,
