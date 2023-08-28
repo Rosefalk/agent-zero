@@ -4,8 +4,9 @@ import minimist from 'minimist'
 import {createText, mockPromise} from './utilities.ts'
 import streams from "./streams.ts";
 
-const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], tab = '') =>
-	stream.reduce(async (previousPromise: Promise<any>, streamlet) => {
+const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], tab = '') => {
+	
+	return stream.reduce(async (previousPromise: Promise<any>, streamlet) => {
 		await previousPromise
 		streamlet.type = <typeof streamlet['type']>streamlet.type
 
@@ -14,8 +15,10 @@ const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], t
 
 			let newPage: Page | null = null
 			
-			if(streamlet.type === 'page') newPage = <Page>(await streams['page'](page, streamlet, accumulator, tab))
-			else streams[streamlet.type]
+			if(streamlet.type === 'page') {
+				newPage = <Page>(await streams['page'](page, streamlet, accumulator, tab))
+			}
+			streams[streamlet.type]
 				? await streams[streamlet.type](page, streamlet, accumulator, tab)
 				: console.warn(`• unsuported stream type ${streamlet.type}: skipping`)
 
@@ -42,7 +45,7 @@ const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], t
 
 		return accumulator
 	}, Promise.resolve())
-
+}
 
 // support for raspberry pi
 const init = async (config: Config[]) => {
