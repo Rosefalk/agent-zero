@@ -1,15 +1,21 @@
-import type { StreamInvoker, Streamlet, Accumulator } from "./types.ts";
+import type { StreamInvoker, Streamlet } from "./types.ts";
 import {HTTPResponse} from "puppeteer";
 import { randomUUID } from "crypto";
 // Simple
 
-export const page: StreamInvoker = async (page, { type, url = '' })=>
+export const page: StreamInvoker = async (page, {}, tab) => {
+	console.info('tab', tab)
+	console.log(`  ${tab}• Page Created`)
+	await page.browser().newPage()
+}
+
+export const goTo: StreamInvoker = async (page, { type, url = '' })=>
 	await page.goto(url).catch((error: string) => console.error(type, error))
 
 export const wait: StreamInvoker = async (page, { type, element = '', visible = true, timeout = 0 }) =>
 	await page.waitForSelector(element, { visible, timeout }).catch((error: string) => console.error(type, error))
 
-export const waitnetwork: StreamInvoker = async (page, { type, until = 'networkidle0' }) =>
+export const waitNetwork: StreamInvoker = async (page, { type, until = 'networkidle0' }) =>
 	await page.waitForNavigation({ waitUntil: until }).catch((error: string) => console.error(type, error))
 
 export const reload: StreamInvoker = async (page, { type }) =>
@@ -100,15 +106,15 @@ export const endpoints: StreamInvoker = async (page, streamlet, accumulator, tab
 }
 	
 export const screenshot: StreamInvoker = async (page, streamlet, accumulator, tab) => {
-	const path = streamlet.path || `screenshots/${randomUUID()}.png`
+	const path = streamlet.path || `screenshots/${(new Date).toISOString().split(':').shift()}-${randomUUID()}.png`
 	await page.screenshot({path})
 	console.log(`  ${tab}└ screenshot saved as ${path}`)
 }
 
 /* Streamlet Utilities */
-export const run: StreamInvoker = async (page, streamlet, accumulator: Accumulator) => {// Last resort you can use this to run your own custom thing
+export const run: StreamInvoker = async (page, streamlet, accumulator) => {// Last resort you can use this to run your own custom thing
 	const rtn = streamlet.handle
-		? streamlet.handle(page, streamlet, accumulator)
+		? await streamlet.handle(page, streamlet, accumulator)
 		: null
 	
 	if(!rtn) console.warn(`• streamlet ${streamlet.type} has no handle function`)
@@ -118,18 +124,19 @@ export const run: StreamInvoker = async (page, streamlet, accumulator: Accumulat
 
 export const accumulation: StreamInvoker = async (page, streamlet, accumulator) => 
 	streamlet.handle
-	? streamlet.handle(page, streamlet, accumulator)
+	? await streamlet.handle(page, streamlet, accumulator)
 	: null
 
 
 export default {
 	// Simple
 	page,
+	goTo,
 	wait,
 	reload,
 	click,
 	keyboardPress,
-	waitnetwork,
+	waitNetwork,
 	// Compound
 	login,
 	evaluate,

@@ -9,7 +9,7 @@ const config: Config[] = [{
 		timeout: 0
 	},
 	stream: [{
-		type: 'page',
+		type: 'goTo',
 		url: 'https://example.com',
 		stream: [{
 			type: 'wait',

@@ -1,4 +1,5 @@
 ﻿import type {Page, PuppeteerLaunchOptions} from "puppeteer";
+import streams from './streams'
 
 export type Config = {
 	browsers: number, // number of browsers to open for each user
@@ -10,7 +11,7 @@ export type Config = {
 export type Accumulator = unknown[]
 
 export type Streamlet = {
-	type: 'page' | 'wait' | 'reload' | 'click' | 'keyboardPress' | 'login' | 'evaluate' | 'run' | 'accumulation' | 'endpoints' | 'waitnetwork' | 'screenshot',
+	type: keyof typeof streams,
 	accumulate?: boolean,
 	grab?: string,
 	log?: { date: boolean },

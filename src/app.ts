@@ -8,17 +8,22 @@ const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], t
 	
 	return stream.reduce(async (previousPromise: Promise<any>, streamlet) => {
 		await previousPromise
-		streamlet.type = <typeof streamlet['type']>streamlet.type.toLowerCase()
+		streamlet.type = <typeof streamlet['type']>streamlet.type
 
 		const run = async () => {
 			console.log(`${tab}> ${streamlet.type}${streamlet.url ? ': ' + streamlet.url : ''}`)
 
+			let newPage: Page | null = null
+			
+			if(streamlet.type === 'page') {
+				newPage = <Page>(await streams['page'](page, streamlet, accumulator, tab))
+			}
 			streams[streamlet.type]
 				? await streams[streamlet.type](page, streamlet, accumulator, tab)
 				: console.warn(`• unsuported stream type ${streamlet.type}: skipping`)
 
 			if(Array.isArray(streamlet.stream))
-				await flow(page, streamlet.stream, accumulator, tab + '  ')
+				await flow(newPage || page, streamlet.stream, accumulator, tab + '  ')
 		}
 
 		const loopy = () => new Promise((resolve) => {
