@@ -3,13 +3,13 @@ import {HTTPResponse} from "puppeteer";
 import { randomUUID } from "crypto";
 // Simple
 
-export const page: StreamInvoker = async (page, { type, url = '' })=>
+export const goTo: StreamInvoker = async (page, { type, url = '' })=>
 	await page.goto(url).catch((error: string) => console.error(type, error))
 
 export const wait: StreamInvoker = async (page, { type, element = '', visible = true, timeout = 0 }) =>
 	await page.waitForSelector(element, { visible, timeout }).catch((error: string) => console.error(type, error))
 
-export const waitnetwork: StreamInvoker = async (page, { type, until = 'networkidle0' }) =>
+export const waitNetwork: StreamInvoker = async (page, { type, until = 'networkidle0' }) =>
 	await page.waitForNavigation({ waitUntil: until }).catch((error: string) => console.error(type, error))
 
 export const reload: StreamInvoker = async (page, { type }) =>
@@ -124,12 +124,12 @@ export const accumulation: StreamInvoker = async (page, streamlet, accumulator) 
 
 export default {
 	// Simple
-	page,
+	goTo,
 	wait,
 	reload,
 	click,
 	keyboardPress,
-	waitnetwork,
+	waitNetwork,
 	// Compound
 	login,
 	evaluate,

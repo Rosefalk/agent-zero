@@ -4,11 +4,10 @@ import minimist from 'minimist'
 import {createText, mockPromise} from './utilities.ts'
 import streams from "./streams.ts";
 
-const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], tab = '') => {
-	
-	return stream.reduce(async (previousPromise: Promise<any>, streamlet) => {
+const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], tab = '') =>
+	stream.reduce(async (previousPromise: Promise<any>, streamlet) => {
 		await previousPromise
-		streamlet.type = <typeof streamlet['type']>streamlet.type.toLowerCase()
+		streamlet.type = <typeof streamlet['type']>streamlet.type
 
 		const run = async () => {
 			console.log(`${tab}> ${streamlet.type}${streamlet.url ? ': ' + streamlet.url : ''}`)
@@ -40,7 +39,7 @@ const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], t
 
 		return accumulator
 	}, Promise.resolve())
-}
+
 
 // support for raspberry pi
 const init = async (config: Config[]) => {
