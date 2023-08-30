@@ -10,7 +10,7 @@ node_modules/
 dist/
 configs/
 screenshots/**
-
+.npmrc
 # Compiled Java class files
 *.class
 
