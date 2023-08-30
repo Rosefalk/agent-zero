@@ -6,7 +6,7 @@
   "main": "app.js",
   "author": "",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/rosefalk/agent-zero#readme",
+  "homepage": "https://github.com/Rosefalk/agent-zero",
   "scripts": {
     "watch": "nodemon --exec \"npm run lint && node app\"",
     "build": "tsc",
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://rosefalk@bitbucket.org/rosefalk/agent-zero.git"
+    "url": "https://github.com/Rosefalk/agent-zero.git"
   },
   "eslintConfig": {
     "env": {
