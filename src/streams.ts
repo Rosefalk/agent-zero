@@ -1,12 +1,14 @@
 import type { StreamInvoker, Streamlet } from "./types.ts";
 import {HTTPResponse} from "puppeteer";
 import { randomUUID } from "crypto";
-// Simple
+import {getPageIndex} from "./utilities.ts";
 
-export const page: StreamInvoker = async (page, {}, tab) => {
-	console.info('tab', tab)
-	console.log(`  ${tab}• Page Created`)
-	await page.browser().newPage()
+// Simple
+export const page: StreamInvoker = async (page, _streamlet, _accumulator, tab) => {
+	const newPage = await page.browser().newPage()
+	console.log(`  ${tab}• Page Created [${await getPageIndex(newPage)}]`)
+	
+	return newPage
 }
 
 export const goTo: StreamInvoker = async (page, { type, url = '' })=>
@@ -97,10 +99,9 @@ export const endpoints: StreamInvoker = async (page, streamlet, accumulator, tab
 		}
 	}, {})
 
-	if(streamlet.accumulate) accumulator.push(responseReturn)
-	else {
-		console.log(`  ${tab}└ endpoints result`, responseReturn)
-	}
+	streamlet.accumulate
+		? accumulator.push(responseReturn)
+		: console.log(`  ${tab}└ endpoints result`, responseReturn)
 
 	return responseReturn
 }

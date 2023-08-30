@@ -1,7 +1,7 @@
 import type {Accumulator, Config, Stream} from "./types.ts";
 import puppeteer, {Page} from 'puppeteer';
 import minimist from 'minimist'
-import {createText, mockPromise} from './utilities.ts'
+import {createText, getPageIndex, mockPromise} from './utilities.ts'
 import streams from "./streams.ts";
 
 const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], tab = '') => {
@@ -15,12 +15,11 @@ const flow = async (page: Page, stream: Stream, accumulator: Accumulator = [], t
 
 			let newPage: Page | null = null
 			
-			if(streamlet.type === 'page') {
+			if(streamlet.type === 'page')
 				newPage = <Page>(await streams['page'](page, streamlet, accumulator, tab))
-			}
-			streams[streamlet.type]
+			else streams[streamlet.type]
 				? await streams[streamlet.type](page, streamlet, accumulator, tab)
-				: console.warn(`• unsuported stream type ${streamlet.type}: skipping`)
+				: console.warn(`• unsupported stream type ${streamlet.type}: skipping`)
 
 			if(Array.isArray(streamlet.stream))
 				await flow(newPage || page, streamlet.stream, accumulator, tab + '  ')
@@ -71,7 +70,7 @@ const init = async (config: Config[]) => {
 
 			if (!page) return console.error('No page')
 
-			console.info('• Page Created')
+			console.log(`• Page Created [${await getPageIndex(page)}]`)
 			console.info('• Ready')
 			console.info(createText.header('Starting Stream'))
 

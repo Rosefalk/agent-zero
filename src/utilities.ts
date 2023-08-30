@@ -1,4 +1,5 @@
 import axios from 'axios'
+import {Page} from "puppeteer";
 
 /**
  * IFTTT Maker Webhook https://help.ifttt.com/hc/en-us/articles/115010230347-Webhooks-service-FAQ
@@ -34,3 +35,6 @@ export const createText = {
 export const mockPromise = (time: number) => new Promise((resolve) => {
 	const interval: NodeJS.Timeout = setInterval(() => resolve( () => clearInterval(interval)), time)
 })
+
+export const getPageIndex = async (page: Page) =>
+	(await page.browser().pages()).findIndex(p => p === page)
