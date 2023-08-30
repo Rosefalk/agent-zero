@@ -16,6 +16,7 @@
     "start": "ts-node --esm ./src/app.ts"
   },
   "dependencies": {
+    "@types/minimist": "^1.2.2",
     "axios": "^1.4.0",
     "minimist": "^1.2.5",
     "puppeteer": "^20.9.0",
@@ -23,7 +24,6 @@
     "typescript": "^5.1.6"
   },
   "devDependencies": {
-    "@types/minimist": "^1.2.2",
     "eslint": "^7.11.0"
   },
   "repository": {
