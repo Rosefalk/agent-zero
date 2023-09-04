@@ -1,6 +1,6 @@
 {
   "name": "agent-zero",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This README would normally document whatever steps are necessary to get your application up and running.",
   "type": "module",
   "main": "app.js",
