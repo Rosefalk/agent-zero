@@ -6,6 +6,7 @@ export type Config = {
 	puppeteer: PuppeteerLaunchOptions,
 	stream: Stream
 	name?: string,
+	finalEvaluator?: (accumulator: Accumulator) => Promise<void>,
 }
 
 export type Accumulator = unknown[]

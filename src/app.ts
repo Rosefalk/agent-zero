@@ -81,12 +81,20 @@ const init = async (config: Config[]) => {
 			console.info(createText.header('End of stream reached - closing'))
 
 			await browser.close()
+			
+			return {
+				name: userConfig.name,
+				browser: i,
+				result,
+			}
 		})
-
-		return await Promise.all(processes)
+		
+		return await Promise.all(processes) 
 	})
 
-	await Promise.all(userProcesses)
+	const results = await Promise.all(userProcesses)
+
+	process.stdout.write(JSON.stringify(results))
 	
 	process.exit()
 }
